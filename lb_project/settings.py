@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     # My apps.
     'learning_blogs',
     'accounts',
+    # 'learning_blogs.apps.CeleryConfig',
 
     # Third party apps.
     'django_bootstrap5',
@@ -131,7 +132,18 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 # My settings.
 LOGIN_REDIRECT_URL = 'learning_blogs:index'
 LOGOUT_REDIRECT_URL = 'learning_blogs:index'
 LOGIN_URL = 'accounts:login'
+
+NO_REPLY_EMAIL = 'admin@noreply.com'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# Celery Configuration Options
+CELERY_BROKER_URL = 'pyamqp://guest@localhost//'
+# CELERY_RESULT_BACKEND = 'redis://localhost'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True

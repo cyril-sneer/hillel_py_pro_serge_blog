@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
 from .models import Topic, Entry
-from .forms import TopicForm, EntryForm
+from .forms import TopicForm, EntryForm, ContactUsForm
+from .tasks import contact_us_email
 
 
 def index(request):
@@ -101,3 +103,27 @@ def edit_entry(request, entry_id):
 
 def check_topic_owner(topic: Topic, user):
     return True if topic.owner == user else False
+
+
+def contact_us(request):
+    """Отправляет сообщение администрации сайта"""
+
+    if request.method != 'POST':
+        # Данные не отправлялись; создается пустая форма.
+        form = ContactUsForm()
+    else:
+        # Отправлены данные POST; обработать данные.
+        form = ContactUsForm(data=request.POST)
+        if form.is_valid():
+            contact_us_email.apply_async(
+                kwargs={"subject": form.cleaned_data['user_subject'],
+                        "message": form.cleaned_data['user_message'],
+                        "from_email": settings.NO_REPLY_EMAIL,
+                        "recipient_list": [form.cleaned_data['user_email'], ],
+                        },
+            )
+            return redirect('learning_blogs:index')
+
+        # Вывести пустую или недействительную форму.
+    context = {'form': form}
+    return render(request, 'learning_blogs/contact_us.html', context)
