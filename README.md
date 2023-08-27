@@ -1,2 +1,2 @@
 # hillel_py_pro_serge_blog
-Blog project
+Learning blog project + bootstrap styles 
