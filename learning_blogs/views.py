@@ -110,20 +110,20 @@ def contact_us(request):
 
     if request.method != 'POST':
         # Данные не отправлялись; создается пустая форма.
-        form = ContactUsForm()
+        cu_form = ContactUsForm()
     else:
         # Отправлены данные POST; обработать данные.
-        form = ContactUsForm(data=request.POST)
-        if form.is_valid():
+        cu_form = ContactUsForm(data=request.POST)
+        if cu_form.is_valid():
             contact_us_email.apply_async(
-                kwargs={"subject": form.cleaned_data['user_subject'],
-                        "message": form.cleaned_data['user_message'],
+                kwargs={"subject": cu_form.cleaned_data['user_subject'],
+                        "message": cu_form.cleaned_data['user_message'],
                         "from_email": settings.NO_REPLY_EMAIL,
-                        "recipient_list": [form.cleaned_data['user_email'], ],
+                        "recipient_list": [cu_form.cleaned_data['user_email'], ],
                         },
             )
             return redirect('learning_blogs:index')
 
         # Вывести пустую или недействительную форму.
-    context = {'form': form}
+    context = {'cu_form': cu_form}
     return render(request, 'learning_blogs/contact_us.html', context)

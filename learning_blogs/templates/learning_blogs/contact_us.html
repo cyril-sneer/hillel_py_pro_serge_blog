@@ -10,7 +10,7 @@
 
     <form action="{% url 'learning_blogs:contact_us' %}" method='post'>
         {% csrf_token %}
-        {% bootstrap_form form %}
+        {% bootstrap_form cu_form %}
         {% bootstrap_button button_type='submit' content='Submit' %}
     </form>
 
