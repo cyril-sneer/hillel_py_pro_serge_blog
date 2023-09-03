@@ -20,4 +20,7 @@ urlpatterns = [
     path('edit_entry/<int:entry_id>/', views.edit_entry, name='edit_entry'),
     # Страница Contact Us
     path('contact_us/', views.contact_us, name='contact_us'),
+    # Страница Contact Us (modal)
+    path('contact_us_modal/', views.contact_us_modal, name='contact_us_modal'),
+
 ]

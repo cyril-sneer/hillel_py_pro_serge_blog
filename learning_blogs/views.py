@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, JsonResponse
+from django.template.loader import render_to_string
 
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm, ContactUsForm
@@ -127,3 +128,23 @@ def contact_us(request):
         # Вывести пустую или недействительную форму.
     context = {'cu_form': cu_form}
     return render(request, 'learning_blogs/contact_us.html', context)
+
+
+def save_contact_us_form(request, form, template_name):
+    data = dict()
+    if request.method == 'POST':
+        if form.is_valid():
+            pass  # Тут будет вся логика
+        else:
+            data['form_is_valid'] = False
+    content = {'form': form}
+    data['html_form'] = render_to_string(template_name, content, request=request)
+    return JsonResponse(data)
+
+
+def contact_us_modal(request):
+    if request.method == 'POST':
+        form = ContactUsForm(request.POST)
+    else:
+        form = ContactUsForm()
+    return save_contact_us_form(request, form, 'learning_blogs/contact_us_modal.html')
