@@ -127,18 +127,27 @@ def contact_us(request):
 
         # Вывести пустую или недействительную форму.
     context = {'cu_form': cu_form}
-    return render(request, 'learning_blogs/contact_us.html', context)
+    return render(request=request, template_name='learning_blogs/contact_us.html', context=context)
 
 
 def save_contact_us_form(request, form, template_name):
+    """Отправляет сообщение администрации сайта через модальное окно"""
     data = dict()
     if request.method == 'POST':
         if form.is_valid():
-            pass  # Тут будет вся логика
+            # form.save() - save не нужно, т.к. у меня не ModelForm, а просто Form
+            data['form_is_valid'] = True
+            contact_us_email.apply_async(
+                kwargs={"subject": form.cleaned_data['user_subject'],
+                        "message": form.cleaned_data['user_message'],
+                        "from_email": settings.NO_REPLY_EMAIL,
+                        "recipient_list": [form.cleaned_data['user_email'], ],
+                        },
+            )
         else:
             data['form_is_valid'] = False
-    content = {'form': form}
-    data['html_form'] = render_to_string(template_name, content, request=request)
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name=template_name, context=context, request=request)
     return JsonResponse(data)
 
 
@@ -147,4 +156,4 @@ def contact_us_modal(request):
         form = ContactUsForm(request.POST)
     else:
         form = ContactUsForm()
-    return save_contact_us_form(request, form, 'learning_blogs/contact_us_modal.html')
+    return save_contact_us_form(request=request, form=form, template_name='learning_blogs/contact_us_modal.html')
